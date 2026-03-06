@@ -1,114 +1,64 @@
-# 🔍 Fulcra Sleep Detective
+# Fulcra Sleep Detective
 
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Built with OpenClaw](https://img.shields.io/badge/Built%20with-OpenClaw-blue)](https://openclaw.ai)
-[![Powered by Fulcra](https://img.shields.io/badge/Powered%20by-Fulcra-purple)](https://fulcradynamics.com)
-[![Python 3.10+](https://img.shields.io/badge/Python-3.10+-yellow.svg)](https://python.org)
+[![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![OpenClaw](https://img.shields.io/badge/Built%20with-OpenClaw-orange)](https://github.com/openclaw/openclaw)
+[![Fulcra](https://img.shields.io/badge/Powered%20by-Fulcra-green)](https://fulcradynamics.com)
 
-**AI-powered sleep investigation engine that forms theories, asks questions, and tracks experiments using real biometric data.**
+**AI sleep detective that forms theories, asks questions, and tracks experiments**
 
-Not another sleep dashboard. This is a health detective — it correlates sleep stages with HRV, glucose, exercise, calendar density, supplement timing, and lifestyle factors to find what actually moves the needle for your sleep.
+## Overview
+
+The Fulcra Sleep Detective is an AI-powered sleep investigation engine that goes beyond simple tracking. Instead of just showing you charts, it acts as a health detective that correlates sleep patterns with biometric data, calendar events, supplements, and lifestyle factors to generate actionable theories about your sleep quality.
 
 ## Features
 
-- **🧠 Theory-Driven Investigation** — Forms testable hypotheses about your sleep, tracks evidence and counter-evidence
-- **📊 Multi-Stream Correlation** — Every insight requires data from 2+ streams (sleep + glucose, HRV + exercise, calendar + deep sleep)
-- **⏰ UTC-Safe Sleep Parsing** — Correctly handles overnight sleep sessions that span UTC day boundaries (a surprisingly common bug)
-- **🚨 Proactive Alerts** — 7 alert types with cooldown deduplication, only fires when something actionable changes
-- **📝 Annotation Integration** — Leverages Fulcra's annotation system (medications, supplements, devices) as positive signals
-- **💬 Conversation as Data Source** — Context from human conversation feeds back into the analysis
-- **🔄 Investigation Loops** — Observe anomaly → ask user same day → record answer → suggest change → track results → report back
+### 7 Theory Types
+- **Sleep Debt Theory**: Tracks cumulative sleep deficit and recovery patterns
+- **HRV Correlation Theory**: Connects heart rate variability with sleep quality
+- **Glucose Impact Theory**: Analyzes blood sugar patterns and sleep disruption
+- **Exercise Timing Theory**: Correlates workout timing with sleep onset and quality
+- **Calendar Stress Theory**: Links meeting density and stress with sleep metrics
+- **Supplement Efficacy Theory**: Tracks supplement timing and sleep improvements
+- **Environmental Theory**: Analyzes room conditions, temperature, and external factors
 
-## Data Sources (via Fulcra API)
+### Core Capabilities
+- **Multi-stream correlation**: Combines sleep, HRV, glucose, exercise, calendar, and supplement data
+- **UTC-safe sleep parsing**: Handles timezone changes and travel accurately
+- **Proactive alerts**: Warns about conditions likely to impact tonight's sleep
+- **Annotation integration**: Learns from your manual notes and observations
+- **Conversation-as-data**: Treats your feedback as structured data for theory refinement
 
-| Stream | Source | What It Tells You |
-|--------|--------|-------------------|
-| Sleep stages | Apple Watch | Deep/Core/REM/Awake architecture |
-| HRV (SDNN) | Apple Watch | Autonomic nervous system recovery |
-| Blood Glucose | Dexcom CGM | Overnight glucose crashes, dawn effect |
-| Workouts | Apple Watch | Exercise timing and intensity impact |
-| Calendar | Apple Calendar | Meeting density → stress → sleep quality |
-| Location | Apple/Google | Travel, environment changes |
-| Nutrition | Lose It! | Late eating, macronutrient balance |
-| Annotations | Fulcra App | Medication timing, supplement tracking |
-
-## Quick Start
+## Installation
 
 ```bash
-# Install dependencies
-pip install fulcra-api pandas numpy scipy
+pip install fulcra-api
+```
 
-# Configure Fulcra credentials
-# Get your token at https://fulcradynamics.com
-export FULCRA_TOKEN_PATH="~/.config/fulcra/token.json"
-
-# Run sleep analysis
-python scripts/fulcra_sleep_utils.py
-
-# Run full daily insights
-python scripts/fulcra-daily-insights.py
-
-# Run proactive alerts
-python scripts/fulcra-proactive-alerts.py
+Configure your Fulcra API token:
+```bash
+fulcra auth configure
 ```
 
 ## Architecture
 
 ```
-Fulcra Context API
-    ├── sleep_agg()          → Sleep stages, duration, timing
-    ├── metric_samples()     → HRV, HR, glucose, steps
-    ├── apple_workouts()     → Exercise sessions
-    ├── calendar_events()    → Schedule density
-    ├── location_visits()    → Travel detection
-    ├── moment_annotations() → Medication/supplement timing
-    └── scale_annotations()  → Mood ratings
-         │
-         ▼
-    Sleep Detective Engine
-    ├── fulcra_sleep_utils.py   — UTC-safe sleep data parsing
-    ├── fulcra-daily-insights.py — Cross-domain pattern detection
-    ├── fulcra-proactive-alerts.py — Multi-stream anomaly alerting
-    └── fulcra-context-dump.py  — Raw data export for LLM reasoning
-         │
-         ▼
-    Theory Engine
-    ├── Form hypotheses from data patterns
-    ├── Ask user questions to gather context
-    ├── Track evidence + counter-evidence
-    ├── Suggest behavior experiments
-    └── Monitor experiment results
+Fulcra API → Sleep Detective → Theory Engine → Alert System
+    ↓              ↓               ↓              ↓
+Raw Data → Correlation → Hypothesis → Action
 ```
 
-## How It Works
+The system continuously ingests biometric streams, applies statistical correlation analysis, generates testable hypotheses, and provides actionable recommendations.
 
-1. **Data Collection** — Pulls biometric data from Fulcra every 2 hours during waking hours
-2. **Pattern Detection** — 16 built-in detectors scan for cross-domain correlations
-3. **Theory Formation** — When a pattern is detected, a testable theory is created
-4. **Investigation** — The AI asks the user targeted questions to gather context sensors can't capture
-5. **Experiment Tracking** — Behavior changes are suggested and their results monitored
-6. **Insight Deduplication** — Never surfaces the same observation twice
+## Built with OpenClaw + Fulcra
 
-## Example Theories
+This project showcases the power of combining [OpenClaw](https://github.com/openclaw/openclaw)'s AI agent framework with [Fulcra](https://fulcradynamics.com)'s comprehensive biometric API. OpenClaw provides the conversational intelligence and automation capabilities, while Fulcra delivers the rich health data stream necessary for meaningful pattern detection.
 
-- "Late bedtime correlates with reduced deep sleep — optimal window appears to be 11:00-11:15 PM"
-- "Heavy meeting days (6+) predict 40% less deep sleep than light days"
-- "Overnight glucose crashes to 75 mg/dL coincide with 1-1.5h wakeups"
-- "Exercise improves sleep quality but temporarily suppresses HRV for 24h"
-
-## Privacy
-
-- All data stays local — no cloud processing beyond the Fulcra API
-- No PII in this repo — all examples use anonymized data
-- Token paths are configurable via environment variables
-- Designed for self-hosted OpenClaw deployments
-
-## Built With
-
-- **[OpenClaw](https://openclaw.ai)** — Open-source AI agent framework
-- **[Fulcra](https://fulcradynamics.com)** — Personal context API for health data
-- **[Context by Fulcra](https://apps.apple.com/us/app/context-by-fulcra/id1633037434)** — iOS app for data collection
+**Key Integration Points:**
+- OpenClaw's natural language processing for theory interpretation
+- Fulcra's unified API for multi-device biometric data
+- Real-time correlation analysis between behavioral and physiological markers
+- Proactive health coaching through intelligent alerting
 
 ## License
 
-MIT — see [LICENSE](LICENSE)
+MIT License - Copyright 2026 Arc (arc-claw-bot)

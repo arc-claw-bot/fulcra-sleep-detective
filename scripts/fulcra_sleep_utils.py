@@ -1,70 +1,57 @@
-#!/usr/bin/env python3
 """
-MIT License
+Shared sleep data utility for all Fulcra scripts.
 
-Copyright (c) 2026 OpenClaw Community
+PERMANENT FIX for the UTC date selection problem:
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Fulcra's sleep_agg API returns data bucketed by UTC calendar day.
+Each bucket contains the COMPLETE night (not a partial). The bucket
+for a given UTC date contains the sleep session that ENDED on that
+UTC calendar day.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+Example: Sleep 11 PM ET Mar 5 → 6 AM ET Mar 6
+  = Sleep 4 AM UTC Mar 6 → 11 AM UTC Mar 6
+  → All data is in the Mar 6 UTC bucket (complete, not split)
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-"""
+THE BUG: Using `datetime.now(utc).date()` as the target. This works
+at 7:30 AM ET (= 12:30 PM UTC Mar 6 → Mar 6 ✓) but BREAKS at
+8 PM ET (= 1 AM UTC Mar 7 → Mar 7 ✗, no sleep data yet).
 
-"""
-Fulcra Sleep Data Utility Library
+THE FIX: Always use today's date in ET, then use that as the UTC
+period date. "Last night's sleep" = today's ET date = the UTC bucket
+where that sleep session lives.
 
-A comprehensive utility library for accessing and processing sleep data from
-the Fulcra API. Handles timezone conversion, sleep stage analysis, and 
-provides convenient functions for sleep pattern analysis.
-
-Key Features:
-- Automatic timezone handling (ET ↔ UTC conversion)
-- Sleep stage analysis (deep, core, REM, awake)
-- Fragmentation and efficiency calculations
-- Historical sleep data retrieval
-- Robust error handling for API inconsistencies
-
-Built with OpenClaw + Fulcra for health data automation.
+Every script that needs sleep data should use get_last_night_sleep() from here.
+DO NOT call sleep_agg directly in other scripts.
 """
 
 import json
-import os
 import pandas as pd
 from datetime import datetime, timedelta, timezone, date
 from zoneinfo import ZoneInfo
 
+from fulcra_timezone import get_user_tz, now_local, today_local, to_local, format_local_time
 
-ET = ZoneInfo('America/New_York')
+
+# ET is now dynamic — fetched from Fulcra user profile, handles DST automatically
+# Kept as a property for backward compatibility with scripts that reference ET directly
+@property
+def _et():
+    return get_user_tz()
+
+# For backward compat: scripts that do `from fulcra_sleep_utils import ET`
+# This will be set on first use
+ET = get_user_tz()
+
 STAGE_NAMES = {2: 'deep', 3: 'core', 4: 'rem', 5: 'awake'}
 
 
 def get_fulcra_client():
-    """Get authenticated Fulcra API client with configurable token path."""
+    """Get authenticated Fulcra API client."""
+    from pathlib import Path
     from fulcra_api.core import FulcraAPI
     api = FulcraAPI()
-    
-    # Configurable token path via environment variable
-    token_path = os.environ.get(
-        "FULCRA_TOKEN_PATH", 
-        os.path.expanduser("~/.config/fulcra/token.json")
-    )
-    
-    with open(token_path, 'r') as f:
-        td = json.load(f)
-    
+    token_path = Path.home() / '.config' / 'fulcra' / 'token.json'
+    td = json.load(open(token_path))
     api.set_cached_access_token(td['access_token'])
     api.set_cached_refresh_token(td['refresh_token'])
     return api
@@ -82,13 +69,10 @@ def _get_target_utc_date(for_date=None):
     
     Args:
         for_date: Optional date object (ET date). Defaults to today ET.
-        
-    Returns:
-        date: The correct UTC period date for sleep data retrieval
     """
     if for_date is not None:
         return for_date
-    return datetime.now(ET).date()
+    return today_local()
 
 
 def get_last_night_sleep(client=None, target_date=None):
@@ -169,7 +153,7 @@ def get_last_night_sleep(client=None, target_date=None):
     awake_min = awake_ms / 60000
     frag_pct = (awake_ms / total_bed_ms * 100) if total_bed_ms > 0 else 0
     
-    # Calculate sleep stage percentages
+    # Percentages
     deep_ms = stages.get('deep', 0) * 60000
     deep_pct = (deep_ms / total_sleep_ms * 100) if total_sleep_ms > 0 else 0
     rem_ms = stages.get('rem', 0) * 60000
@@ -177,10 +161,10 @@ def get_last_night_sleep(client=None, target_date=None):
     core_ms = stages.get('core', 0) * 60000
     core_pct = (core_ms / total_sleep_ms * 100) if total_sleep_ms > 0 else 0
     
-    # Sleep efficiency calculation
+    # Efficiency
     efficiency = (total_sleep_ms / total_bed_ms * 100) if total_bed_ms > 0 else 0
     
-    # Fragmentation analysis with emoji indicators
+    # Fragmentation label
     if frag_pct < 10:
         frag_label, emoji = "low", "🟢"
     elif frag_pct < 20:
@@ -188,21 +172,21 @@ def get_last_night_sleep(client=None, target_date=None):
     elif frag_pct < 30:
         frag_label, emoji = "high", "🟠"
     else:
-        frag_label, emoji = "severe", "🔴"
+        frag_label, emoji = "severe", "⚠️"
     
-    # Format bedtime and wake times for display
+    # Parse bedtime/wake for display
     bedtime_str = ""
     wake_str = ""
     if sleep_start:
         try:
             dt = datetime.fromisoformat(sleep_start.replace('Z', '+00:00'))
-            bedtime_str = dt.astimezone(ET).strftime('%-I:%M %p')
+            bedtime_str = format_local_time(dt)
         except:
             pass
     if sleep_end:
         try:
             dt = datetime.fromisoformat(sleep_end.replace('Z', '+00:00'))
-            wake_str = dt.astimezone(ET).strftime('%-I:%M %p')
+            wake_str = format_local_time(dt)
         except:
             pass
     
@@ -228,20 +212,15 @@ def get_last_night_sleep(client=None, target_date=None):
 
 def get_sleep_history(client=None, days=7):
     """
-    Get multiple nights of sleep data for trend analysis.
+    Get multiple nights of sleep data.
     
-    Args:
-        client: FulcraAPI instance (created if None)
-        days: Number of days of history to retrieve (default: 7)
-    
-    Returns:
-        list: Sleep data dicts (newest first), one per night.
-              Each night uses the ET date as the key.
+    Returns list of dicts (newest first), one per night.
+    Each night uses the ET date (not UTC) as the key.
     """
     if client is None:
         client = get_fulcra_client()
     
-    today_et = datetime.now(ET).date()
+    today_et = today_local()
     results = []
     
     for d in range(days):
@@ -254,10 +233,11 @@ def get_sleep_history(client=None, days=7):
     return results
 
 
-# Example usage and testing
+# Quick test when run directly
 if __name__ == "__main__":
-    print("Testing Fulcra sleep utility...")
-    print(f"Today ET: {datetime.now(ET).date()}")
+    print("Testing sleep utility...")
+    print(f"Today local: {today_local()}")
+    print(f"User timezone: {get_user_tz()}")
     print(f"Current UTC: {datetime.now(timezone.utc).date()}")
     print()
     

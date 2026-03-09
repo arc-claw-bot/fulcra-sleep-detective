@@ -23,6 +23,7 @@ The Fulcra Sleep Detective is an AI-powered sleep investigation engine that goes
 
 ### Core Capabilities
 - **Multi-stream correlation**: Combines sleep, HRV, glucose, exercise, calendar, and supplement data
+- **Dynamic timezone support**: Automatically detects your timezone from Fulcra user profile — DST-aware via Python's `ZoneInfo`
 - **UTC-safe sleep parsing**: Handles timezone changes and travel accurately
 - **Proactive alerts**: Warns about conditions likely to impact tonight's sleep
 - **Annotation integration**: Learns from your manual notes and observations

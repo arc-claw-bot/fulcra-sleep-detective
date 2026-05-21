@@ -377,7 +377,7 @@ Theories will be wrong. When data contradicts a theory:
 
 - **Fulcra account** with connected data sources (Apple Health, nutrition app, etc.)
 - **OpenClaw** (or similar agent framework) with cron jobs and messaging
-- **Python 3** with `fulcra-api` package installed
+- **Python 3** with the `fulcra-api` package installed and `uv` available for Fulcra CLI commands (`uv tool run fulcra-api`)
 - **Token refresh cron** (every 12h) to keep API access alive
 - **~30 min** for the bootstrap interview
 - **A human willing to answer questions** — the system only gets as smart as the context it's given

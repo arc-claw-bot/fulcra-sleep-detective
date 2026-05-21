@@ -1,3 +1,8 @@
+---
+name: fulcra-sleep-detective
+description: AI sleep investigation that uses Fulcra sleep, biometric, calendar, exercise, supplement, and lifestyle context to generate theories, proactive alerts, daily insights, and follow-up questions about sleep quality.
+---
+
 # Fulcra Sleep Detective - OpenClaw Skill
 
 ## Overview

@@ -10,14 +10,15 @@ AI-powered sleep investigation that goes beyond tracking to generate theories an
 - `sleep-insights` - Daily analysis with correlations and recommendations
 
 ## Dependencies
-- `fulcra-api` - Biometric data access
+- `fulcra-api` - Python biometric data access package
+- `uv tool run fulcra-api` - Fulcra CLI authentication and one-off CLI commands
 - `pandas` - Data analysis
 - `numpy` - Statistical calculations
 
 ## Configuration
 Set up Fulcra API credentials:
 ```
-fulcra auth configure
+uv tool run fulcra-api auth login
 ```
 
 ## Usage in OpenClaw

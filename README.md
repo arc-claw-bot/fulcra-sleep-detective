@@ -37,7 +37,7 @@ pip install fulcra-api
 
 Configure your Fulcra API token:
 ```bash
-fulcra auth configure
+uv tool run fulcra-api auth login
 ```
 
 ## Architecture

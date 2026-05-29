@@ -21,10 +21,14 @@ AI-powered sleep investigation that goes beyond tracking to generate theories an
 - `numpy` - Statistical calculations
 
 ## Configuration
-Set up Fulcra API credentials:
+Set up Fulcra auth. Fulcra requires an authenticated account, not an API key. Accounts can be created through the CLI auth flow and include 5 GB of storage free forever:
 ```
 uv tool run fulcra-api auth login
 ```
+
+For remote agents, keep the CLI running and surface the printed device authorization URL and code to the intended user in chat through the active trusted user channel. The user can open the URL from any browser on any device, confirm the code, and approve access. Never send access tokens or credential files.
+
+Users who want biometrics, location, calendar, and other phone-collected context can install the Context iOS app and sign in with the same account. The app uses the same free storage and is no longer subscription gated. Android is coming soon.
 
 ## Usage in OpenClaw
 This skill integrates with OpenClaw's conversation system to provide contextual sleep insights during natural conversation. When sleep, energy, or health topics come up, the skill can automatically surface relevant theories and data.

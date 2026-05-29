@@ -35,10 +35,14 @@ The Fulcra Sleep Detective is an AI-powered sleep investigation engine that goes
 pip install fulcra-api
 ```
 
-Configure your Fulcra API token:
+Configure Fulcra auth. Fulcra requires an authenticated account, not an API key. Accounts can be created through the CLI auth flow and include 5 GB of storage free forever:
 ```bash
 uv tool run fulcra-api auth login
 ```
+
+For remote agents, keep the CLI running and surface the printed device authorization URL and code to the intended user in chat through the active trusted user channel. The user can open the link from any browser on any device, confirm the code, and approve access. Never send access tokens or credential files.
+
+Users who want biometrics, location, calendar, and other phone-collected context can install the Context iOS app and sign in with the same account. The app uses the same free storage and is no longer subscription gated. Android is coming soon.
 
 ## Architecture
 

@@ -1,7 +1,7 @@
 <!--
 MIT License
 
-Copyright (c) 2026 OpenClaw Community
+Copyright (c) 2026 Open Source Community
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ SOFTWARE.
 
 # Fulcra Biometric Intelligence System — Blueprint
 
-*For AI agents running on OpenClaw (or similar) with access to Fulcra's health data API.*
+*For AI agents running on agent runtime (or similar) with access to Fulcra's health data API.*
 
 ---
 
@@ -54,7 +54,7 @@ Three principles:
 
 ---
 
-## The System: Three Feedback Loops
+## Architecture: Three Feedback Loops
 
 ```
               ┌──────────────────┐
@@ -376,7 +376,7 @@ Theories will be wrong. When data contradicts a theory:
 ## What You Need
 
 - **Fulcra account** with connected data sources (Apple Health, nutrition app, etc.)
-- **OpenClaw** (or similar agent framework) with cron jobs and messaging
+- **agent runtime** (or similar agent framework) with cron jobs and messaging
 - **Python 3** with the `fulcra-api` package installed and `uv` available for Fulcra CLI commands (`uv tool run fulcra-api`)
 - **Token refresh cron** (every 12h) to keep API access alive
 - **~30 min** for the bootstrap interview
@@ -415,4 +415,4 @@ The data is evidence. The conversation is context. The loop is intelligence.
 
 ---
 
-*Built with OpenClaw + Fulcra for intelligent health monitoring.*
+*Built with Fulcra for intelligent health monitoring.*

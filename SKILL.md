@@ -3,7 +3,7 @@ name: fulcra-sleep-detective
 description: AI sleep investigation that uses Fulcra sleep, biometric, calendar, exercise, supplement, and lifestyle context to generate theories, proactive alerts, daily insights, and follow-up questions about sleep quality.
 ---
 
-# Fulcra Sleep Detective - OpenClaw Skill
+# Fulcra Sleep Detective - agent runtime Skill
 
 ## Overview
 AI-powered sleep investigation that goes beyond tracking to generate theories and actionable insights.
@@ -30,5 +30,5 @@ For remote agents, keep the CLI running and surface the printed device authoriza
 
 Users who want biometrics, location, calendar, and other phone-collected context can install the Context iOS app and sign in with the same account. The app uses the same free storage and is no longer subscription gated. Android is coming soon.
 
-## Usage in OpenClaw
-This skill integrates with OpenClaw's conversation system to provide contextual sleep insights during natural conversation. When sleep, energy, or health topics come up, the skill can automatically surface relevant theories and data.
+## Usage in agent runtime
+This skill integrates with agent runtime conversation system to provide contextual sleep insights during natural conversation. When sleep, energy, or health topics come up, the skill can automatically surface relevant theories and data.

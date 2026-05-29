@@ -2,7 +2,7 @@
 """
 MIT License
 
-Copyright (c) 2026 OpenClaw Community
+Copyright (c) 2026 Open Source Community
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,7 @@ Key Features:
 - Both JSON and human-readable output formats
 - Configurable lookback periods
 
-Built with OpenClaw + Fulcra for comprehensive health data analysis.
+Built with Fulcra for comprehensive health data analysis.
 
 Usage:
   python3 fulcra-context-dump.py [--days N] [--json]

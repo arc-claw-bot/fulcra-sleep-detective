@@ -2,7 +2,7 @@
 """
 MIT License
 
-Copyright (c) 2026 OpenClaw Community
+Copyright (c) 2026 Open Source Community
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ Key Features:
 - Nutrition analysis with logging completeness detection
 - Meeting load vs recovery correlation
 
-Built with OpenClaw + Fulcra for automated health monitoring.
+Built with Fulcra for automated health monitoring.
 """
 
 import json, os, shlex, subprocess, sys

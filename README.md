@@ -1,7 +1,7 @@
 # Fulcra Sleep Detective
 
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![OpenClaw](https://img.shields.io/badge/Built%20with-OpenClaw-orange)](https://github.com/openclaw/openclaw)
+[![agent runtime](https://img.shields.io/badge/Built%20with-agent runtime-orange)](https://github.com/agent-runtime)
 [![Fulcra](https://img.shields.io/badge/Powered%20by-Fulcra-green)](https://fulcradynamics.com)
 
 **AI sleep detective that forms theories, asks questions, and tracks experiments**
@@ -54,12 +54,12 @@ Raw Data → Correlation → Hypothesis → Action
 
 The system continuously ingests biometric streams, applies statistical correlation analysis, generates testable hypotheses, and provides actionable recommendations.
 
-## Built with OpenClaw + Fulcra
+## Built with Fulcra
 
-This project showcases the power of combining [OpenClaw](https://github.com/openclaw/openclaw)'s AI agent framework with [Fulcra](https://fulcradynamics.com)'s comprehensive biometric API. OpenClaw provides the conversational intelligence and automation capabilities, while Fulcra delivers the rich health data stream necessary for meaningful pattern detection.
+This project showcases the power of combining [agent runtime](https://github.com/agent-runtime)'s AI agent framework with [Fulcra](https://fulcradynamics.com)'s comprehensive biometric API. agent runtime provides the conversational intelligence and automation capabilities, while Fulcra delivers the rich health data stream necessary for meaningful pattern detection.
 
 **Key Integration Points:**
-- OpenClaw's natural language processing for theory interpretation
+- agent runtime natural language processing for theory interpretation
 - Fulcra's unified API for multi-device biometric data
 - Real-time correlation analysis between behavioral and physiological markers
 - Proactive health coaching through intelligent alerting

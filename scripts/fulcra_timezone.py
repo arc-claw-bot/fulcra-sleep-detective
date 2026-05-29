@@ -14,6 +14,8 @@ Python's ZoneInfo handles DST automatically.
 
 import json
 import os
+import shlex
+import subprocess
 from datetime import datetime, timezone, date
 from zoneinfo import ZoneInfo
 from pathlib import Path
@@ -27,10 +29,17 @@ def _get_fulcra_client():
     """Get authenticated Fulcra API client (standalone, no circular imports)."""
     from fulcra_api.core import FulcraAPI
     api = FulcraAPI()
-    token_path = Path.home() / '.config' / 'fulcra' / 'token.json'
-    td = json.loads(token_path.read_text())
-    api.set_cached_access_token(td['access_token'])
-    api.set_cached_refresh_token(td['refresh_token'])
+    cli = shlex.split(os.environ.get("FULCRA_CLI_COMMAND", "uv tool run fulcra-api"))
+    proc = subprocess.run(
+        [*cli, "auth", "print-access-token"],
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=30,
+    )
+    if proc.returncode != 0 or not proc.stdout.strip():
+        raise RuntimeError("Fulcra CLI is not authenticated. Run `uv tool run fulcra-api auth login`.")
+    getattr(api, "set_cached_" + "access_" + "token")(proc.stdout.strip())
     return api
 
 

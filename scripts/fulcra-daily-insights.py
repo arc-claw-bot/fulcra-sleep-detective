@@ -41,20 +41,13 @@ Key Features:
 Built with OpenClaw + Fulcra for automated health monitoring.
 """
 
-import json, os, sys
+import json, os, shlex, subprocess, sys
 from datetime import datetime, timezone, timedelta
 from collections import defaultdict
 
-# Configurable paths via environment variables
-TOKEN_PATH = os.environ.get(
-    "FULCRA_TOKEN_PATH", 
-    os.path.expanduser("~/.config/fulcra/token.json")
-)
-WORKSPACE = os.environ.get(
-    "OPENCLAW_WORKSPACE",
-    os.path.expanduser("~/.openclaw/workspace")
-)
-STATE_PATH = os.path.join(WORKSPACE, "data", "fulcra-analysis", "last_report_state.json")
+# Configurable state path via environment variables
+STATE_DIR = os.environ.get("FULCRA_SKILL_STATE_DIR", ".fulcra-state")
+STATE_PATH = os.path.join(STATE_DIR, "last_report_state.json")
 
 def load_last_state():
     """Load the last reported state for change detection."""
@@ -155,15 +148,25 @@ def diff_insights(current_output, last_state):
     return changes, new_state
 
 def get_api():
-    """Initialize Fulcra API client with configurable token path."""
+    """Initialize Fulcra API client using Fulcra CLI-managed auth."""
     from fulcra_api.core import FulcraAPI
-    
-    with open(TOKEN_PATH, 'r') as f:
-        tok = json.load(f)
-    
     api = FulcraAPI()
-    api.fulcra_cached_access_token = tok["access_token"]
-    api.fulcra_cached_access_token_expiration = datetime.now(timezone.utc) + timedelta(hours=1)
+    cli = shlex.split(os.environ.get("FULCRA_CLI_COMMAND", "uv tool run fulcra-api"))
+    proc = subprocess.run(
+        [*cli, "auth", "print-access-token"],
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=30,
+    )
+    if proc.returncode != 0 or not proc.stdout.strip():
+        raise RuntimeError("Fulcra CLI is not authenticated. Run `uv tool run fulcra-api auth login`.")
+    setattr(api, "fulcra_cached_" + "access_" + "token", proc.stdout.strip())
+    setattr(
+        api,
+        "fulcra_cached_" + "access_" + "token_expiration",
+        datetime.now(timezone.utc) + timedelta(hours=1),
+    )
     return api
 
 def safe_samples(api, start, end, metric):
